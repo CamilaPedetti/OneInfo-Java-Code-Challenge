@@ -1,4 +1,4 @@
-package com.oneInfo.demo;
+package com.oneInfo.challenge;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
