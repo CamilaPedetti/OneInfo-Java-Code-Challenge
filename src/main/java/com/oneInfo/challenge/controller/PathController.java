@@ -32,7 +32,7 @@ public class PathController {
 	}
 
 	@ResponseStatus
-	@GetMapping("/GET /paths/{source_id}/{destination_id}")
+	@GetMapping("/paths/{source_id}/{destination_id}")
 	ResponseEntity<ShortestPathResult> findShortestPath(@PathVariable Long source_id, @PathVariable Long destination_id) {
 		ShortestPathResult result = pathService.findShortestPath(source_id, destination_id);
         return ResponseEntity.ok(result);
