@@ -23,7 +23,7 @@ public class StationRepository {
 	public void save(Station station) {
 		System.out.println("agregando la estación: " + station.getStation_id());
 		this.stations.add(station);
-		System.out.println("Se agregando la estación correctamente");
+		System.out.println("Se agrego la estación correctamente");
 	}
 
 	public void replace(Station station) {
