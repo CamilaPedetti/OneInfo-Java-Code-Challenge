@@ -14,6 +14,9 @@ public class Path {
 		this.cost = cost;
 	}
 	
+    public Path() {
+    }
+    
 	public Long getPath_id() {
 		return path_id;
 	}

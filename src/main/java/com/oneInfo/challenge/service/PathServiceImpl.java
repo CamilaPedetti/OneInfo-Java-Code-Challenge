@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.oneInfo.challenge.model.Path;
+import com.oneInfo.challenge.model.PathNode;
 import com.oneInfo.challenge.model.ShortestPathResult;
 import com.oneInfo.challenge.model.Station;
 import com.oneInfo.challenge.repository.PathRepository;
@@ -29,6 +30,7 @@ public class PathServiceImpl implements PathService{
 	@Autowired
 	PathRepository pathRepository;
 		
+	@Override
 	public ResponseEntity<String> addPath(Path path) {
 		try {
 			if(path.getSource_id() > path.getDestination_id()) {
@@ -44,7 +46,7 @@ public class PathServiceImpl implements PathService{
 			
 			if(!this.haveStation(path.getSource_id(),path.getDestination_id())) {
 				return ResponseEntity.status(HttpStatus.CONFLICT)
-	                    .body("El id del inicio o fin no contiene ninguna estación asignada");
+	                    .body("El id ya se asigno a otro camino");
 			}
 			
 			if(!pathRepository.findById(path.getPath_id()).isEmpty()) {
@@ -78,24 +80,19 @@ public class PathServiceImpl implements PathService{
 	}
 	
 
-	/*public PathShort findShortestPath(Long start, Long end) {
-		return null;
-	}*/
-	
+	@Override
 	public ShortestPathResult findShortestPath(Long sourceId, Long destinationId) {
         Map<Long, Double> minDistances = new HashMap<>();
         Map<Long, Long> previousNodes = new HashMap<>();
         // Cola de prioridad para elegir el nodo con menor costo
         PriorityQueue<PathNode> priorityQueue = new PriorityQueue<>(Comparator.comparing(PathNode::getCost));
 
-        // Inicializar todos los costos como infinitos excepto el nodo de origen
         for (Path path : pathRepository.getAllPaths()) {
             minDistances.put(path.getSource_id(), Double.MAX_VALUE);
             minDistances.put(path.getDestination_id(), Double.MAX_VALUE);
         }
         minDistances.put(sourceId, 0.0);
 
-        // Agregar nodo de origen a la cola
         priorityQueue.add(new PathNode(sourceId, 0.0));
 
         // Algoritmo de Dijkstra
@@ -103,7 +100,6 @@ public class PathServiceImpl implements PathService{
             PathNode currentNode = priorityQueue.poll();
             Long currentNodeId = currentNode.getNodeId();
 
-            // Si llegamos al nodo destino, no necesitamos continuar
             if (currentNodeId.equals(destinationId)) {
                 break;
             }
@@ -130,7 +126,6 @@ public class PathServiceImpl implements PathService{
             currentNodeId = previousNodes.get(currentNodeId);
         }
 
-        // Si el primer nodo en el camino no es el nodo de origen, no hay camino
         if (shortestPath.isEmpty() || !shortestPath.get(0).equals(sourceId)) {
             return new ShortestPathResult(Collections.emptyList(), 0D);
         }
@@ -138,24 +133,8 @@ public class PathServiceImpl implements PathService{
         return new ShortestPathResult(shortestPath, minDistances.get(destinationId));
     }
 
-    // Clase auxiliar para almacenar nodo y su costo acumulado
-    private static class PathNode {
-        private final Long nodeId;
-        private final Double cost;
-
-        public PathNode(Long nodeId, Double cost) {
-            this.nodeId = nodeId;
-            this.cost = cost;
-        }
-
-        public Long getNodeId() {
-            return nodeId;
-        }
-
-        public Double getCost() {
-            return cost;
-        }
+    @Override
+    public Optional<Path> findById(Long id) {
+        return pathRepository.findById(id);
     }
-
-
 }
